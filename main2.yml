@@ -4,7 +4,7 @@
     - repo:
         src:pgsql.repo
         dest:/etc/yum.repos.d/pgsql.repo
-	- postgresql:
+    - postgresql:
         version: 10
         state: present
   tasks:
