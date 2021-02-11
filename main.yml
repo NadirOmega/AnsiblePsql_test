@@ -1,0 +1,26 @@
+- name: Install postgresql
+  hosts: localhost
+  vars:
+    - repo:
+        url: https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    - postgresql:
+        version: 10
+        state: absent
+  tasks:
+    - name: "Stage 1: install repository package"
+      yum:
+        state: "{{ postgresql.state|default('present') }}"
+        pkg: "{{ repo.url }}"
+      
+    - name: "Stage 2: install psql "
+      yum:
+        state: "{{ postgresql.state|default('present') }}"
+        pkg: "{{item}}"
+      with_items:
+        -    postgresql{{ postgresql.version }}-server
+        
+    - name: "Clean psql path"
+      file:
+        state: absent
+        path: "/var/lib/pgsql/10/"
+      when: postgresql.state == 'absent'
