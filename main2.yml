@@ -1,0 +1,29 @@
+- name: Install postgresql
+  hosts: localhost
+  vars:
+    - repo:
+        src:pgsql.repo
+        dest:/etc/yum.repos.d/pgsql.repo
+	- postgresql:
+        version: 10
+        state: present
+  tasks:
+    - name: "Stage 1: copy repo"
+      copy:
+        src: "{{repo.src}}"
+        dest: "{{repo.dest}}"
+      
+    - name: "Stage 2: install psql "
+      yum:
+        state: "{{ postgresql.state|default('present') }}"
+        pkg: "{{item}}"
+      with_items:
+        - libicu
+        - postgresql10-libs
+        - postgresql{{ postgresql.version }}-server
+        
+    - name: "Clean psql path"
+      file:
+        state: absent
+        path: "/var/lib/pgsql/10/"
+      when: postgresql.state == 'absent'
